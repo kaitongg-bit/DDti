@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDTI - 你的另一半是哪一个棣</title>
+<style>
+:root {
+  /* 定义全局颜色和字体变量 */
+  --font-sans: 'PingFang SC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --color-text-primary: #2B1F3B;
+  --color-text-secondary: #665C7A;
+  --color-background-primary: #FFFFFF;
+  --color-background-secondary: #F7F4FF;
+  --color-border-secondary: #DDD3F4;
+  --color-border-tertiary: #EDE6FA;
+  --border-radius-md: 10px;
+  --border-radius-lg: 16px;
+  --theme-main: #7B57D1;
+  --theme-light: #F1EBFF;
+  --theme-dark: #432A7A;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: var(--color-background-secondary); color: var(--color-text-primary); }
+.app { max-width: 600px; margin: 0 auto; padding: 2rem 1.5rem; min-height: 100vh; background: var(--color-background-primary); box-shadow: 0 4px 20px rgba(123, 87, 209, 0.08); }
+
+/* 封面样式 */
+.cover { text-align: center; padding: 3rem 0; }
+.cover-title { font-size: 28px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.8rem; letter-spacing: 1px; }
+.cover-sub { font-size: 15px; color: var(--color-text-secondary); margin-bottom: 0.5rem; line-height: 1.6; }
+.cover-tag { display: inline-block; background: var(--theme-light); color: var(--theme-dark); font-size: 13px; padding: 6px 16px; border-radius: 30px; margin: 1rem 0 2rem; font-weight: 500; }
+.start-btn { background: linear-gradient(135deg, #9C7AF0, #7B57D1); color: white; border: none; border-radius: 30px; padding: 16px 48px; font-size: 18px; font-weight: 500; cursor: pointer; box-shadow: 0 8px 16px rgba(123, 87, 209, 0.25); transition: transform 0.2s, box-shadow 0.2s; }
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(123, 87, 209, 0.35); }
+
+/* 答题区样式 */
+.progress-bar { height: 6px; background: var(--color-border-tertiary); border-radius: 3px; margin-bottom: 2rem; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--theme-main); border-radius: 3px; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.q-counter { font-size: 14px; color: var(--theme-main); font-weight: 500; margin-bottom: 0.8rem; }
+.q-text { font-size: 19px; font-weight: 600; line-height: 1.5; margin-bottom: 2rem; }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.opt-btn { background: var(--color-background-primary); border: 1.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 16px 20px; text-align: left; cursor: pointer; font-size: 15px; color: var(--color-text-primary); line-height: 1.5; transition: all 0.2s; position: relative; overflow: hidden; }
+.opt-btn:hover { border-color: #BDA8EB; background: #F7F2FF; }
+.opt-btn.selected { border-color: var(--theme-main); background: var(--theme-light); color: var(--theme-dark); font-weight: 500; box-shadow: 0 4px 10px rgba(123, 87, 209, 0.15); }
+.nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2.5rem; }
+.nav-btn { background: transparent; border: 1.5px solid var(--color-border-secondary); border-radius: 20px; padding: 10px 24px; cursor: pointer; font-size: 15px; color: var(--color-text-secondary); transition: all 0.2s; }
+.nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.nav-btn.primary { background: var(--theme-main); color: white; border-color: var(--theme-main); font-weight: 500; }
+.nav-btn.primary:not(:disabled):hover { background: #6547B3; }
+
+/* 结果页样式 */
+.result-header { text-align: center; margin-bottom: 2rem; animation: fadeIn 0.8s ease; }
+.result-image-frame { width: min(100%, 260px); height: 320px; margin: 0 auto 1rem; border-radius: var(--border-radius-lg); overflow: hidden; box-shadow: 0 8px 20px rgba(123, 87, 209, 0.2); border: 2px solid white; background: #f5f5f5; }
+.result-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.result-card { background: white; border: 1.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.8rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); animation: slideUp 0.6s ease forwards; opacity: 0; transform: translateY(20px); }
+.result-card:nth-child(2) { animation-delay: 0.2s; }
+.result-card:nth-child(3) { animation-delay: 0.4s; }
+.section-title { font-size: 16px; font-weight: 600; color: var(--theme-dark); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; }
+.section-title::before { content: ''; display: inline-block; width: 4px; height: 16px; background: var(--theme-main); border-radius: 2px; }
+
+.result-name { font-size: 32px; font-weight: 600; color: var(--theme-main); margin-bottom: 0.25rem; }
+.result-role { font-size: 15px; color: var(--color-text-secondary); margin-bottom: 1.2rem; display: inline-block; background: var(--theme-light); padding: 4px 12px; border-radius: 20px; }
+.result-desc { font-size: 15px; color: var(--color-text-primary); line-height: 1.8; margin-bottom: 1rem; text-align: justify; }
+.psy-match { padding: 12px 16px; background: #F8F9FA; border-left: 3px solid #6C757D; border-radius: 4px 8px 8px 4px; font-size: 14px; color: #495057; line-height: 1.6; margin-top: 1rem; }
+.result-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.5rem; }
+.tag { font-size: 13px; padding: 6px 14px; border-radius: 20px; background: #F1EBFF; color: #432A7A; font-weight: 500; border: 1px solid #DCD1FA; }
+
+/* 评分条美化 */
+.score-row { margin-bottom: 12px; }
+.score-label-wrap { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: var(--color-text-primary); font-weight: 500; }
+.score-desc { font-size: 12px; color: var(--color-text-secondary); font-weight: normal; }
+.score-bar-wrap { height: 8px; background: var(--color-border-tertiary); border-radius: 4px; overflow: hidden; }
+.score-bar-fill { height: 100%; background: linear-gradient(90deg, #B79AF0, #7B57D1); border-radius: 4px; width: 0; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+.psy-analysis { font-size: 15px; line-height: 1.8; color: var(--theme-dark); background: #F7F2FF; padding: 18px; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #DCD1FA; text-align: justify; }
+
+.retry-btn { background: transparent; border: 2px solid var(--theme-main); color: var(--theme-main); border-radius: 30px; padding: 14px 24px; cursor: pointer; font-size: 16px; font-weight: 500; margin-top: 1rem; width: 100%; transition: all 0.2s; }
+.retry-btn:hover { background: var(--theme-light); }
+.hidden { display: none !important; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <!-- 封面页 -->
+  <div id="cover-page">
+    <div class="cover">
+      <div style="font-size:14px;color:var(--theme-main);font-weight:600;margin-bottom:1rem;">王鹤棣宇宙：谁是最适合你的男友？</div>
+      <div class="cover-title">DDTI</div>
+      <div class="cover-sub">25道灵魂叩问，测出与你最匹配的棣系男友类型</div>
+      <div class="cover-tag">8维人格解析 · 宿命感羁绊测试</div>
+      <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:2.5rem;line-height:1.8;">
+        15个平行宇宙角色正在等待共振<br>从恋爱直觉到职场抗压，全面测算你们的灵魂契合度
+      </div>
+      <button class="start-btn" onclick="startTest()">开启意识连结 →</button>
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:1rem;opacity:0.9;">仅供娱乐免责声明：本测试结果基于趣味题目生成，不构成任何现实建议。</div>
+    </div>
+  </div>
+
+  <!-- 答题页 -->
+  <div id="test-page" class="hidden">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-counter" id="q-counter"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="options" id="options"></div>
+    <div class="nav">
+      <button class="nav-btn" id="back-btn" onclick="prevQ()">← 上一题</button>
+      <button class="nav-btn primary hidden" id="next-btn" onclick="nextQ()">下一题 →</button>
+      <button class="nav-btn primary hidden" id="finish-btn" onclick="showResult()">解开灵魂图谱 ✦</button>
+    </div>
+  </div>
+
+  <!-- 结果页 -->
+  <div id="result-page" class="hidden"></div>
+</div>
+
+<script>
+// 角色数据，共15个
+const CHARS = {
+  dongfang: { 
+    name:"东方青苍", role:"《苍兰诀》- 三界至尊", 
+    img:"dongfang.png",
+    desc:"你吸引了一个沉默而强大的灵魂。他不轻易动情，但一旦认定你，便是覆海移山。他用行动表达爱，不善言辞却事无巨细地护你周全。在外人眼中他是不可撼动的王，只有你见过他偶尔流露的温柔与脆弱。", 
+    psyMatch:"【灵魂契合点】你骨子里渴望被坚定地选择与绝对的偏爱。东方青苍“本座的人谁敢动”的霸道，能完美填补你对终极安全感的渴望。你需要一座能够依靠的高山，而他正好愿为你低头。",
+    tags:["霸道深情","强大守护","少言重诺","绝对专属"]
+  },
+  xie: { 
+    name:"谢景行", role:"《将门独后》- 桀骜小侯爷", 
+    img:"xie.png",
+    desc:"你招惹了一个看似玩世不恭、实则深不可测的危险男人。他紫衣风流，总是漫不经心地挑逗你，却总在你陷入绝境时如神明般降临。他拥有覆灭皇权的野心，却把唯一的偏爱和后背留给了你。", 
+    psyMatch:"【灵魂契合点】你极其慕强，渴望灵魂的势均力敌。普通的温柔无法满足你，你需要的是谢景行这种极具张力、甚至带点危险气息的顶级推拉。你们不仅是风月里的爱人，更是乱世中并肩下棋、倾覆天下的同谋。",
+    tags:["桀骜风流","顶级拉扯","绝世强强","腹黑专情"]
+  },
+  daoming: { 
+    name:"道明寺", role:"《流星花园》- 霸道纯爱大少爷", 
+    img:"daoming.png",
+    desc:"你遇到了一个脾气暴躁但对你死心塌地的笨蛋少爷。他表达爱的方式笨拙又幼稚，总是试图用金钱或霸道来引起你的注意。但他其实是个纯爱战士，为了你可以毫不犹豫地对抗整个家族和全世界。", 
+    psyMatch:"【灵魂契合点】你骨子里保留着对童话般“霸总爱上我”的纯爱幻想，同时具有包容力。道明寺的直接、幼稚和毫无保留的炽热，能击碎你所有的社交防备，让你感受到一种极其直白、没有退路的偏爱。",
+    tags:["霸道纯爱","对抗世界","笨蛋帅哥","护妻狂魔"]
+  },
+  ran: { 
+    name:"冉方旭", role:"《黑夜告白》- 热血警察", 
+    img:"ran.png",
+    desc:"你遇到了一个认死理的正义青年。他直来直去，不懂绕弯子，但对你的承诺是他钻研过的真理——永远不会改变。他用破案和追寻真理的认真劲儿爱你，每个细节都不放过，只是偶尔直男得会把你气笑。", 
+    psyMatch:"【灵魂契合点】你讨厌感情中的内耗与猜忌，极其厌倦成年人世界的弯弯绕绕。他的坦诚和一根筋，恰好能给你最踏实的落地感。在复杂的现实里，你需要这样一个干干净净、纯粹热烈的灵魂。",
+    tags:["一根筋的爱","高智商直球","正义感","嘴硬心软"]
+  },
+  qi: { 
+    name:"祁晓", role:"《理智派生活》- 贴心小太阳", 
+    img:"qi.png",
+    desc:"你招来了一个黏人又靠谱的小太阳。他比你小，却比你更能扛事；嘴上爱撒娇，心里比谁都明白。他对爱情极其执着，喜欢就是喜欢，不藏不掖，每天都能让你感受到被坚定选择的幸运和轻松。", 
+    psyMatch:"【灵魂契合点】你在生活中可能习惯了坚强或承担很多，潜意识里亟需极高的情绪价值。祁晓的包容、热情和毫无保留的崇拜，能让你卸下沉重的盔甲，舒服地做回被溺爱的小朋友。",
+    tags:["年下奶狗","执着热情","情绪价值拉满","暖心靠谱"]
+  },
+  xu: { 
+    name:"许七安", role:"《大奉打更人》- 恣意少年", 
+    img:"xu.png",
+    desc:"你遇到的是个热血不羁包裹下的深情灵魂。他一身江湖气，能在外面翻云覆雨为苍生拼命，却把最柔软怂包的一面只留给你。和他在一起你会感到无比生动——他既能护你周全，又能带你体验最快意的人生。", 
+    psyMatch:"【灵魂契合点】你不喜欢一眼望到头的生活，渴望感情中有并肩作战的义气和浪漫。许七安那种市井里的智慧、大义前的担当，以及把你放在心尖尖上的市侩深情，精准击中了你的浪漫防线。",
+    tags:["热血深情","江湖义气","大心脏底线","护你如命"]
+  },
+  biao: { 
+    name:"徐天彪", role:"《星河入梦》- 逗逼逆行者", 
+    img:"biao.png",
+    desc:"你遇到了一个用漫不经心掩盖深情的人。他平时可能是个能活跃气氛的糙汉，但面临危机时，他绝对是第一个挡在你面前的人。他的爱是藏在玩笑和粗糙背后的真心，沉甸甸的，需要你用心去感受。", 
+    psyMatch:"【灵魂契合点】你能看透表面，具有很强的同理心。你不需要浮华的浪漫，你能读懂他玩笑话里的认真。你们是灵魂深处的战友，那种历经生死考验后的相视一笑，是你最向往的爱情模样。",
+    tags:["糙汉柔情","牺牲精神","笑中带泪","深藏不露"]
+  },
+  cheng: { 
+    name:"程嘉树", role:"《战火中的青春》- 进步大少爷", 
+    img:"cheng.png",
+    desc:"你吸引了一个阳光又有担当的知识分子。他思维活跃，满脑子都是新鲜想法，却对你格外温柔稳重。他懂得如何让你笑，也知道在你难过时给予最得体的安慰。民国风的深情绅士，绝不只是说说而已。", 
+    psyMatch:"【灵魂契合点】你慕强且欣赏有精神追求的人。他身上的理想主义光辉和良好的教养非常吸引你。你们的爱情不仅是生活上的陪伴，更是灵魂与思想层面的相互点亮。",
+    tags:["阳光暖男","活泼有才","绅士担当","高颜值学霸"]
+  },
+  yan: { 
+    name:"时宴", role:"《以爱为营》- 纯情霸总", 
+    img:"yan.png",
+    desc:"你的另一半是个穿着高定西装的醋坛子。他外表高冷禁欲，实际上对你的一举一动都在意得要命。你多看别人一眼，他就能记一周。爱得小心翼翼，却又控制不住强烈的占有欲——这种成年人的矛盾感，偏偏让人心跳加速。", 
+    psyMatch:"【灵魂契合点】你享受势均力敌的拉扯感。你不喜欢过于直白轻易的感情，时宴这种需要去“攻略”、表面端着私下傲娇的反差萌，刚好满足了你在爱情中的征服欲与被在乎感。",
+    tags:["霸道总裁","隐性醋王","外冷内热","只对你软"]
+  },
+  xiao: { 
+    name:"肖铎", role:"《浮图缘》- 腹黑权臣", 
+    img:"xiao.png",
+    desc:"你遇到的是个极具张力的双面情人。他在外人面前是杀伐果断、锋利嗜血的刀，只有在你面前会卸下所有伪装，甚至露出自卑与讨好。他用最狠戾的方式铺路保护你，却在关起门时，把身家性命都交到你手里。", 
+    psyMatch:"【灵魂契合点】你的内在有着极强的包容力和救赎特质。那种“全世界都怕他，而他只怕你不要他”的极致反差，是你无法抗拒的宿命感。你们的爱注定是浓烈且排他的。",
+    tags:["外狠内软","极致拉扯","占有欲极强","遇爱变小狗"]
+  },
+  baima: { 
+    name:"白马帅", role:"《今日宜加油》- 清澈富二代", 
+    img:"baima.png",
+    desc:"你遇到了一个清澈愚蠢又极度真诚的隐藏富二代。他脑回路清奇，没有半点有钱人的架子，踏踏实实打工，认认真真对你。和他在一起没有狗血虐恋，只有每天被他的奇思妙想逗笑的轻松日常。", 
+    psyMatch:"【灵魂契合点】在疲惫的现实中，你需要一份完全没有压力的感情。白马帅的单纯、钝感力和天然的善良，是你最好的情绪避风港。和他在一起，你不用伪装，开心大笑就好。",
+    tags:["清澈真诚","脑回路奇特","低调有钱","轻松治愈"]
+  },
+  song: { 
+    name:"宋潜机", role:"《咸鱼飞升》- 淡泊深情", 
+    img:"song.png",
+    desc:"你遇到的是个历经沧桑后归于平静的扫地僧。他可以轻易翻覆风云，却觉得天下都不如陪你种田有意思。他对你的爱安静、从容且笃定，是那种哪怕世界毁灭，也会先给你做好一顿饭的相守。", 
+    psyMatch:"【灵魂契合点】你内心深处向往一种“见过繁华后只愿与你相守”的笃定感。你不追求表面的浪漫，而是需要一个精神极其内核稳定的伴侣，能接住你所有的情绪，给你岁月静好的现世安稳。",
+    tags:["隐世大佬","内核稳定","种田浪漫","淡泊深情"]
+  },
+  taohuawo: { 
+    name:"桃花坞小鹤", role:"《五十公里桃花坞》- 本色出演", 
+    img:"taohuawo.png",
+    desc:"你招来了一个黑皮运动系的小太阳。他真实、直接、不装，是人群中最敢说实话的那个，却也是敏锐察觉别人情绪低落并默默陪伴的那个。和他在一起，你会感到前所未有的轻盈与自由。", 
+    psyMatch:"【灵魂契合点】你可能对复杂的人际关系感到厌倦，渴望一种极其透明、健康的相处模式。他的阳光、分寸感和强大的“去油”能力，能瞬间扫除你的阴霾，带你回到最纯粹的快乐频道。",
+    tags:["清醒少年气","运动阳光","社交牛人","粗中有细"]
+  },
+  yuzhou: { 
+    name:"宇宙闪烁王鹤棣", role:"团队灵魂", 
+    img:"yuzhou.png",
+    desc:"你遇到的是团队里最不可或缺的隐形支柱。他看起来是个爱玩闹的显眼包，实际上比谁都细心，能照顾到每个人的情绪，更把你妥帖安放在最重要的位置。他是游戏王，也是你在疲惫时最想靠一靠的肩膀。", 
+    psyMatch:"【灵魂契合点】你需要的是一个能在“玩伴”和“伴侣”之间无缝切换的人。他既能为你提供高质量的陪伴和趣味，又能在关键时刻展现出惊人的靠谱。你们会是最好的一对人生玩家。",
+    tags:["情绪价值拉满","游戏王","团队大脑","有趣灵魂"]
+  },
+  kechan: { 
+    name:"亲爱的客栈老板棣", role:"最佳主理人", 
+    img:"kezhan.png",
+    desc:"你遇到的是个把你当宝、眼里有活的踏实男友。他干最多的活，夸最多的人，是那种让你安心到想立刻和他有个家的人。他的爱不是轰轰烈烈的偶像剧，而是每天醒来为你准备好的热豆浆，真实且温暖。", 
+    psyMatch:"【灵魂契合点】你非常务实，深知陪伴是最长情的告白。你需要的是极高的行动力而非空头支票。他这种“不说废话就是干”，默默把生活打理得井井有条的特质，能给你带来满分的安全感。",
+    tags:["踏实勤奋","眼里有活","夸夸发言机","行动派爱人"]
+  }
+};
+
+// 【升级至 8大维度】全景雷达
+const DIMS = ["dominant","warm","playful","reliable","romantic","ambitious","rebellious","independent"];
+const DIM_LABELS = {
+  dominant: { title: "慕强与臣服", desc: "渴望力量引领，潜意识寻找绝对保护的Alpha特质" },
+  warm:     { title: "共振与治愈", desc: "情感触角敏锐，极度渴求情绪价值与无条件接纳" },
+  playful:  { title: "自由与鲜活", desc: "抗拒枯燥日常，需要灵魂玩伴一起打破沉闷" },
+  reliable: { title: "秩序与锚点", desc: "现实主义底色，用极致的安全感抵御未知" },
+  romantic: { title: "极致与宿命", desc: "保留纯爱信仰，追求惊天动地与无可替代的羁绊" },
+  ambitious:{ title: "锋芒与野心", desc: "极具事业心与胜负欲，渴望在世俗巅峰比肩而立" },
+  rebellious:{ title: "叛逆与破局", desc: "骨子里的不驯，拒绝世俗凝视，追求打破常规的刺激" },
+  independent:{ title: "边界与独立", desc: "清醒且极度看重个人空间，无论多爱都保持灵魂独立" }
+};
+
+// 8维直击灵魂的百万级心理分析
+const PSY_PROFILES = {
+  dominant: "【慕强与臣服 - 领航者依赖】<br><br>你在外人面前往往表现得独立、清醒甚至有点强势，常常是被别人依赖的角色。但正因如此，你潜意识里极度渴望一个能在精神上“压制”你、引领你的人。你不需要一个只会顺从的伴侣，你需要一座能让你卸下所有防备、安心做回小孩的高山。<br><br>当另一半展现出绝对的实力和“凡事有我”的霸道时，你骨子里积压的疲惫和温柔就会毫无保留地释放。对你而言，真正的自由，是被一个比你更强大的人坚定地护在身后。",
+  
+  warm:     "【共振与治愈 - 灵魂捕手】<br><br>你的情感触角极其敏锐，能轻易察觉到别人忽视的细节。这让你在人群中显得很温暖，但也常常让你因为过度共情而感到内耗。在感情中，你最看重的不是世俗的条件，而是“被深深理解”的奇迹。<br><br>你需要另一半能够接住你所有不可理喻的小情绪和潜台词。别人只关心你飞得高不高，而你只想要另一半温柔地问你累不累。他无条件的偏爱和同理心，是你抵御这个世界冰冷和坚硬的唯一解药。",
+  
+  playful:  "【鲜活与挣脱 - 灵感追寻者】<br><br>你骨子里有一丝叛逆，极度恐惧一成不变、一眼望到头的枯燥生活。你讨厌被世俗的条条框框束缚，对你而言，爱情绝不能仅仅是搭伙过日子的柴米油盐，它必须是一场有趣的冒险。<br><br>你渴望的另一半，首先得是你最好的“玩伴”。他能接住你天马行空的梗，不会觉得你幼稚，反而愿意陪你做尽无聊却快乐的废事。只要另一半足够鲜活有趣，哪怕面对生活的鸡零狗碎，你也有把日子折腾得闪闪发光的底气。",
+  
+  reliable: "【秩序与落地 - 锚点寻找者】<br><br>你是一个具有强烈现实感的人。也许是见惯了世事无常，你对画大饼和虚无缥缈的浪漫始终持有一丝怀疑。在你的世界里，爱是动词——是生病时端来的一杯热水，是下雨时偏向你的一把伞，而不是一万句“我爱你”。<br><br>你渴望的另一半必须内核稳定、言出必行。只有这种绝对的踏实感，才能让你产生长久相守的勇气。他不一定要带你去看星辰大海，但他必须是你在这喧嚣世界里最稳固的锚点，让你知道无论走多远，退后一步总有接住你的底线。",
+  
+  romantic: "【极致与宿命 - 纯爱信徒】<br><br>哪怕看透了现实的残酷和人性的复杂，你心里始终保留着一块绝对纯净的领地，信仰着那种惊天动地、非你不可的爱情。你非常看重两人之间的独特羁绊、仪式感以及冥冥之中的缘分。<br><br>你无法接受平庸和权衡利弊的感情。你渴望的另一半，必须能给你带来如电影般刻骨铭心的宿命感。你需要的是毫无保留的奔赴、是偏执的专一，是“即使与世界为敌也要站在你这边”的极致热烈。",
+
+  ambitious:"【锋芒与野心 - 慕强进阶者】<br><br>你骨子里流淌着不甘平庸的血液。你的内驱力极强，拒绝躺平，更看重两个人能否在世俗顶峰相见。你渴望的另一半，必须有着极强的胜负欲和事业心，能在职场或人生的战场上大杀四方。<br><br>你们的爱情不是花前月下的依偎，而是强强联手的破浪前行。你需要的是一个能在名利场里和你背靠背的顶级战友。当你看到他为了目标发狠、展露锋芒的时刻，那是你感到最性感的瞬间。",
+
+  rebellious:"【叛逆与破局 - 规则破坏者】<br><br>你天生带着点反骨，极其厌恶被定义、被说教。世俗眼中的“稳定好伴侣”对你来说就像一潭死水，毫无吸引力。你潜意识里寻找的是一个同样桀骜不驯、敢于对抗世界的灵魂。<br><br>你们的爱是地下室的摇滚乐，是狂风暴雨里的出逃。越是禁忌、越是疯狂、越是打破常规，越能让你感受到活着的战栗。你需要一个敢拉着你从高楼跳入虚空的人，一起把无聊的世界炸个粉碎。",
+
+  independent:"【边界与独立 - 灵魂独行客】<br><br>你极度清醒，深知在任何关系中“自我”永远排在第一位。你不需要依附任何人，也绝不允许任何人打着爱的名义过度侵占你的精神领地。你渴望的另一半，必须懂得“适度的冷漠”与分寸感。<br><br>如果爱意味着失去自我，你宁愿独自美丽。你们的爱情绝不是藤蔓般的病态缠绕，而是两棵树的并肩站立，各自繁茂，偶尔交集。在你的世界里，自由的呼吸甚至比热烈的相拥更重要。"
+};
+
+// 25道题：分数极致夸张化！(10分, 8分制)，指向性极其强烈
+const QUESTIONS = [
+  { q:"难得一个完全没有安排的周末，你通常会怎么度过？", opts:[
+    {t:"列好计划清单，大扫除、健身或推进个人项目",s:{reliable:10, ambitious:5}},
+    {t:"睡到自然醒，点外卖，宅家看剧撸猫不回消息",s:{warm:8, independent:6}},
+    {t:"不做计划出门乱逛，走到哪算哪，主打随性",s:{playful:10, rebellious:5}},
+    {t:"拉着朋友或去社交场合，需要人群带来的能量",s:{dominant:6, playful:8}}
+  ]},
+  { q:"如果另一半突然在工作日出现在你公司楼下等你，你的第一反应是？", opts:[
+    {t:"理智先上线：他是不是遇到什么事了？工作不忙吗？",s:{independent:10, reliable:5}},
+    {t:"超级惊喜，立刻放下手头的事飞奔过去抱他",s:{warm:10, romantic:5}},
+    {t:"心跳加速，觉得像偶像剧，假装淡定地走过去",s:{romantic:10, dominant:5}},
+    {t:"有点不好意思，怕被同事起哄，迅速拉他走开",s:{playful:6, independent:5}}
+  ]},
+  { q:"面对突如其来的高压或重大挫折，你习惯如何自我保护？", opts:[
+    {t:"彻底切断社交，一个人躲起来慢慢舔舐伤口",s:{independent:10, rebellious:5}},
+    {t:"找最亲密的人大哭一场，疯狂倾诉求抱抱",s:{warm:10, playful:3}},
+    {t:"立刻分析问题，强迫自己进入无感情的解决问题模式",s:{reliable:10, ambitious:8}},
+    {t:"用疯狂运动、飙车或大吃一顿来极端发泄",s:{playful:10, rebellious:6}}
+  ]},
+  { q:"大吵一架后，你内心最希望另一半用什么方式破冰？", opts:[
+    {t:"不管谁对谁错，先紧紧抱住我，给我顺毛",s:{warm:10, romantic:6}},
+    {t:"让我静静，等我情绪过去了他再来找我",s:{independent:10, dominant:8}},
+    {t:"用搞笑或装可怜的方式撒娇，把我逗笑",s:{playful:10, warm:5}},
+    {t:"心平气和地坐下来，逐条分析并解决矛盾的核心",s:{reliable:10, ambitious:4}}
+  ]},
+  { q:"如果你能拥有一种超能力，你潜意识最渴望的是？", opts:[
+    {t:"读心术（看透所有人隐藏的悲欢与秘密）",s:{warm:10, independent:4}},
+    {t:"时间倒流（可以弥补遗憾，让一切完美无瑕）",s:{reliable:8, romantic:8}},
+    {t:"瞬间移动（打破物理限制，想去哪就去哪）",s:{playful:10, rebellious:10}},
+    {t:"言灵之力（你说的任何话都会成为绝对法则）",s:{dominant:10, ambitious:10}}
+  ]},
+  { q:"在一段理想的亲密关系中，你觉得自己更像什么角色？", opts:[
+    {t:"被领航者带飞：只要他在，我就能安心闭上眼睛",s:{dominant:10, romantic:5}},
+    {t:"相互取暖的小兽：舔舐彼此的伤口，互相治愈",s:{warm:10, romantic:8}},
+    {t:"结伴探险的玩家：一起打怪升级，把生活当游乐场",s:{playful:10, rebellious:5}},
+    {t:"并肩作战的顶级战友：后背交给对方，势均力敌",s:{ambitious:10, reliable:8}}
+  ]},
+  { q:"突然得到一笔极大的意外奖金，你最有可能的用途是？", opts:[
+    {t:"立刻存入小金库或买稳健的理财，带来绝对安全感",s:{reliable:10, independent:5}},
+    {t:"毫不犹豫买下那个极具美感但毫无用处的心愿物品",s:{romantic:10, playful:6}},
+    {t:"给家人朋友买贵重礼物，或者请大家疯狂消费",s:{warm:10, reliable:4}},
+    {t:"投资自己，作为创业基金或去报昂贵的跨阶层课程",s:{ambitious:10, dominant:6}}
+  ]},
+  { q:"当另一半对你身边的异性朋友表现出明显的吃醋时，你内心的真实感受是？", opts:[
+    {t:"觉得他占有欲发作的样子好可爱，疯狂顺毛",s:{warm:10, playful:5}},
+    {t:"心里暗爽，这恰恰证明了他对我非我不可",s:{dominant:8, romantic:8}},
+    {t:"立刻严肃沟通，表明界限，用事实给他安全感",s:{reliable:10, independent:8}},
+    {t:"极度窒息，觉得他侵犯了我的社交边界与自由",s:{independent:10, rebellious:8}}
+  ]},
+  { q:"如果在美术馆看展，哪类作品最能让你驻足良久？", opts:[
+    {t:"色彩浓烈、充满荒诞与禁忌的超现实画作",s:{rebellious:10, playful:8}},
+    {t:"气势恢宏、展现历史与宏大权谋的古典巨制",s:{dominant:10, ambitious:6}},
+    {t:"配有深情诗句，能触碰内心隐秘柔软的作品",s:{romantic:10, warm:6}},
+    {t:"细节入微、记录普通人苦难与真实的写实摄影",s:{reliable:10, warm:4}}
+  ]},
+  { q:"关于节日送礼，你最容易被哪种方式打动？", opts:[
+    {t:"他花了很久时间，笨手笨脚为你手工制作的唯一专属",s:{warm:10, romantic:8}},
+    {t:"一场毫无预兆的“绑架式”疯狂出逃旅行",s:{playful:10, rebellious:6}},
+    {t:"你随口提过一句，他默默记下并买给你的刚需实用品",s:{reliable:10, independent:4}},
+    {t:"极其昂贵、稀有，能彰显他财力与绝对诚意的重头戏",s:{ambitious:10, dominant:10}}
+  ]},
+  { q:"当别人对你产生严重误解时，你通常的应对方式是？", opts:[
+    {t:"立刻激烈反击，绝不委屈自己，气势上必须撕碎对方",s:{rebellious:10, dominant:8}},
+    {t:"懒得解释，觉得懂的人自然懂，直接冷处理",s:{independent:10, romantic:4}},
+    {t:"压住情绪，摆事实讲道理，用严密逻辑把事情捋清",s:{reliable:10, ambitious:5}},
+    {t:"用高情商的玩笑话四两拨千斤，让对方自己觉得尴尬",s:{playful:10, warm:6}}
+  ]},
+  { q:"另一半突然神色黯然地说“我其实有个很阴暗的秘密”，你会？", opts:[
+    {t:"紧握住他的手：“不管多烂，我都接得住你。”",s:{warm:10, romantic:8}},
+    {t:"心里咯噔一下，保持理智让他说完，迅速准备对策",s:{reliable:10, ambitious:5}},
+    {t:"神经紧绷，如果这个秘密触及我的底线，立刻抽身",s:{independent:10, reliable:8}},
+    {t:"眼底闪过兴奋：“好巧，我也是个反派。”",s:{rebellious:10, playful:10}}
+  ]},
+  { q:"如果要规划一场长途旅行，你的风格更偏向？", opts:[
+    {t:"必须做精确到小时的死磕攻略，不容许任何突发状况",s:{reliable:10, dominant:5}},
+    {t:"只要和对的人去，就算在机场大厅睡一晚也是浪漫",s:{romantic:10, warm:8}},
+    {t:"专挑最刺激、最冷门、最无人涉足的荒野秘境",s:{playful:10, rebellious:6}},
+    {t:"我是绝对的领队，所有人都要臣服于我的节奏安排",s:{dominant:10, ambitious:8}}
+  ]},
+  { q:"在日常相处中，你觉得哪种状态最让你舒适？", opts:[
+    {t:"各回各家，保持绝对空间，相聚时再全身心投入",s:{independent:10, reliable:6}},
+    {t:"每天睡前必须有深度交流，分享彼此的情绪碎片",s:{warm:10, romantic:8}},
+    {t:"随时随地互相抛梗发沙雕图，像两个疯子一样乐",s:{playful:10, warm:5}},
+    {t:"各自在事业的战场上厮杀，顶峰相见时互敬一杯",s:{ambitious:10, dominant:8}}
+  ]},
+  { q:"如果现在必须养个小动物，你的首选会是？", opts:[
+    {t:"一只极其凶悍、只对你臣服的烈性大型犬",s:{dominant:10, ambitious:5}},
+    {t:"一只软糯黏人、走哪跟哪的小猫咪或修狗",s:{warm:10, romantic:5}},
+    {t:"蛇、蜥蜴、蜘蛛等极具暗黑感的小众奇葩宠物",s:{rebellious:10, playful:8}},
+    {t:"电子宠物或多肉植物（绝对省心、不用情绪维护）",s:{independent:10, reliable:8}}
+  ]},
+  { q:"另一半连续加班一周，整个人处于崩溃边缘，你的做法是？", opts:[
+    {t:"什么都不问，把家里打理好，给他炖一锅热汤",s:{warm:10, reliable:6}},
+    {t:"强行拽他出门去飙车、喝酒，用极端方式把脑子放空",s:{playful:10, rebellious:5}},
+    {t:"帮他梳理工作逻辑，甚至直接上手帮他分担任务",s:{ambitious:10, reliable:8}},
+    {t:"心疼但霸道地没收他的电脑，命令他立刻滚去睡觉",s:{dominant:10, romantic:6}}
+  ]},
+  { q:"逛书店时，你最有可能在哪个区域停留最久？", opts:[
+    {t:"商业巨头、权谋历史、帝王将相的人物传记区",s:{ambitious:10, dominant:8}},
+    {t:"文学、诗歌、探讨人性深度的哲学区",s:{romantic:10, warm:5}},
+    {t:"心理学、社会学、探索自我边界的读物区",s:{warm:10, independent:6}},
+    {t:"科幻巨作、烧脑悬疑、甚至禁忌话题区",s:{playful:10, rebellious:6}}
+  ]},
+  { q:"如果另一半在社会地位或能力上远超于你，你的态度是？", opts:[
+    {t:"极度享受！被大佬带飞、躲在羽翼下的感觉太爽了",s:{dominant:10, romantic:5}},
+    {t:"激起狂烈的胜负欲，我必须拼命努力与他平起平坐",s:{ambitious:10, reliable:8}},
+    {t:"各司其职，他在外厮杀，我在内提供情绪价值",s:{warm:10, reliable:6}},
+    {t:"无所谓，关起门来他也就是个被我使唤的笨蛋",s:{playful:10, independent:8}}
+  ]},
+  { q:"在你的潜意识深处，你觉得什么是“终极的成功”？", opts:[
+    {t:"站在金字塔顶端，拥有翻云覆雨的绝对话语权",s:{ambitious:10, dominant:10}},
+    {t:"拥有哪怕世界末日也花不完的钱，和绝对的掌控力",s:{reliable:10, independent:6}},
+    {t:"始终保留感受爱、付出爱以及为一朵花流泪的能力",s:{romantic:10, warm:8}},
+    {t:"打破所有世俗规则，体验极致疯狂，灵魂绝对自由",s:{rebellious:10, playful:10}}
+  ]},
+  { q:"假设你身处极其内卷的娱乐圈，面对潜力后辈与你死磕争夺核心资源，你的真实选择是？", opts:[
+    {t:"展现压倒性的实力降维打击，用实力告诉对方“王座还是我的”",s:{dominant:10, ambitious:10}},
+    {t:"不屑于搞恶性竞争，直接退局，老子不玩了",s:{independent:10, romantic:4}},
+    {t:"表面友善提携，暗地里通宵发力，当个让所有人害怕的卷王",s:{reliable:10, ambitious:8}},
+    {t:"觉得血液沸腾！遇强则强，极其享受这种肾上腺素飙升的刺激战",s:{rebellious:10, playful:8}}
+  ]},
+  { q:"如果你是一个万众瞩目的大明星，你内心最害怕面对的事情是？", opts:[
+    {t:"漫天飞舞的恶意造谣和误解，身边无人可以倾诉依靠",s:{warm:10, romantic:5}},
+    {t:"倾注全部心血的作品扑街，事业受损，被资本放弃",s:{ambitious:10, reliable:8}},
+    {t:"被疯狂私生粉入侵，失去仅存的一点个人边界与隐私",s:{independent:10, rebellious:8}},
+    {t:"从顶流神坛重重跌落，失去掌控全局的权力与光环",s:{dominant:10, ambitious:8}}
+  ]},
+  { q:"很好的朋友在聚会时开玩笑，不小心说出了深深刺痛你的话，你会怎么反应？", opts:[
+    {t:"当场冷脸直接开喷，必须让对方知道我的底线不容践踏",s:{dominant:10, rebellious:8}},
+    {t:"假装没听到，找借口离席，回去后直接拉黑不再联系",s:{independent:10, warm:6}},
+    {t:"用更抓马的自黑把话题岔开，但心里已经给他扣了分",s:{playful:10, warm:5}},
+    {t:"事后私下发长文严肃沟通，讲清逻辑并要求他正式道歉",s:{reliable:10, independent:8}}
+  ]},
+  { q:"如果有两天完全自由的假期，你更倾向于用哪种方式来“回血”？", opts:[
+    {t:"约上兄弟去打高强度篮球、滑雪，大汗淋漓地狂暴放电",s:{playful:10, rebellious:6}},
+    {t:"把自己关在房间死磕一门新技能，继续卷，停下来会焦虑",s:{ambitious:10, reliable:8}},
+    {t:"切断所有信号，一个人开车去深山或海边，拒绝任何人打扰",s:{independent:10, romantic:6}},
+    {t:"组局当主理人，把大家聚在一起办派对，享受做核心人物的快感",s:{dominant:10, reliable:6}}
+  ]},
+  { q:"假设你是一部大男主剧的导演，你最偏爱男主的哪种高光时刻？", opts:[
+    {t:"“天道不公，我便逆天而行”，以一己之力踩碎全世界规则的狂傲",s:{dominant:10, rebellious:10}},
+    {t:"隐忍蛰伏十年，最终手刃仇人、登顶权力的极致爽感",s:{reliable:10, ambitious:8}},
+    {t:"为了心中唯一的爱人，甘愿背上千古骂名、放弃江山的疯批深情",s:{romantic:10, warm:6}},
+    {t:"永远热血不死，即便浑身是伤也要和兄弟并肩战斗到最后的燃",s:{playful:10, warm:8}}
+  ]},
+  { q:"最后一题：闭上眼睛，哪一幕是你心中最向往的、关于爱的画面？", opts:[
+    {t:"天塌下来时，他单枪匹马把你死死护在身后，对全世界拔剑",s:{dominant:10, romantic:8}},
+    {t:"寒冬深夜，他满身风雪推开门，第一件事是用体温把你焐热",s:{warm:10, reliable:8}},
+    {t:"你们在无人的午夜公路狂飙，对着星空像疯子一样大笑尖叫",s:{rebellious:10, playful:8}},
+    {t:"白发苍苍时，他依然每天在相同的时间，为你倒好一杯温水",s:{reliable:10, independent:8}}
+  ]}
+];
+
+let current = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+
+function startTest() {
+  document.getElementById('cover-page').classList.add('hidden');
+  document.getElementById('test-page').classList.remove('hidden');
+  renderQ();
+}
+
+function renderQ() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `第 ${current+1} / ${QUESTIONS.length} 题`;
+  document.getElementById('q-text').textContent = q.q;
+  
+  setTimeout(() => {
+    document.getElementById('progress').style.width = ((current+1)/QUESTIONS.length*100)+'%';
+  }, 50);
+
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  q.opts.forEach((o,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn' + (answers[current]===i ? ' selected' : '');
+    btn.textContent = o.t;
+    btn.onclick = () => selectOpt(i);
+    opts.appendChild(btn);
+  });
+  
+  document.getElementById('back-btn').disabled = current===0;
+  
+  const nb = document.getElementById('next-btn');
+  const fb = document.getElementById('finish-btn');
+  if(current === QUESTIONS.length-1){ 
+    nb.classList.add('hidden'); 
+    fb.classList.remove('hidden'); 
+  } else { 
+    nb.classList.remove('hidden'); 
+    fb.classList.add('hidden'); 
+  }
+  updateNextBtn();
+}
+
+function selectOpt(i) {
+  answers[current] = i;
+  document.querySelectorAll('.opt-btn').forEach((b,bi)=>{
+    b.classList.toggle('selected', bi===i);
+  });
+  updateNextBtn();
+  
+  if(current < QUESTIONS.length-1) {
+    setTimeout(() => { nextQ(); }, 300);
+  }
+}
+
+function updateNextBtn() {
+  const nb = document.getElementById('next-btn');
+  const fb = document.getElementById('finish-btn');
+  const sel = answers[current]!==null;
+  nb.disabled = !sel;
+  fb.disabled = !sel;
+}
+
+function nextQ() {
+  if(answers[current]===null) return;
+  if(current<QUESTIONS.length-1){ current++; renderQ(); }
+}
+function prevQ() {
+  if(current>0){ current--; renderQ(); }
+}
+
+function calcScores() {
+  // 8 个维度
+  const s = {dominant:0, warm:0, playful:0, reliable:0, romantic:0, ambitious:0, rebellious:0, independent:0};
+  QUESTIONS.forEach((q,qi)=>{
+    if(answers[qi]===null) return;
+    const ds = q.opts[answers[qi]].s;
+    Object.keys(ds).forEach(k=>{ s[k] = (s[k]||0) + ds[k]; });
+  });
+  return s;
+}
+
+// 8维雷达图欧氏距离匹配（包含道明寺、谢景行在内的 15 个模型，权重精确调校）
+function matchChar(s) {
+  let totalScore = 0;
+  DIMS.forEach(d => totalScore += s[d]);
+  if(totalScore === 0) totalScore = 1; 
+  
+  let userProfile = {};
+  DIMS.forEach(d => userProfile[d] = s[d] / totalScore);
+
+  // 15 个角色全新的 8 维数据模型（每一行相加等于 1.0）
+  const charProfiles = {
+    dongfang: {dominant:0.25, warm:0.05, playful:0.05, reliable:0.10, romantic:0.15, ambitious:0.25, rebellious:0.10, independent:0.05}, 
+    xie:      {dominant:0.20, warm:0.05, playful:0.15, reliable:0.10, romantic:0.15, ambitious:0.20, rebellious:0.10, independent:0.05}, // 谢景行：高野心+强拉扯+慕强
+    daoming:  {dominant:0.20, warm:0.05, playful:0.15, reliable:0.05, romantic:0.25, ambitious:0.05, rebellious:0.20, independent:0.05}, // 道明寺：极致纯爱+叛逆笨蛋
+    ran:      {dominant:0.05, warm:0.10, playful:0.05, reliable:0.35, romantic:0.05, ambitious:0.10, rebellious:0.20, independent:0.10}, 
+    qi:       {dominant:0.05, warm:0.25, playful:0.15, reliable:0.10, romantic:0.15, ambitious:0.05, rebellious:0.05, independent:0.20}, 
+    xu:       {dominant:0.10, warm:0.15, playful:0.10, reliable:0.10, romantic:0.15, ambitious:0.15, rebellious:0.15, independent:0.10}, 
+    biao:     {dominant:0.05, warm:0.10, playful:0.30, reliable:0.10, romantic:0.05, ambitious:0.10, rebellious:0.20, independent:0.10}, 
+    cheng:    {dominant:0.05, warm:0.15, playful:0.10, reliable:0.20, romantic:0.10, ambitious:0.15, rebellious:0.05, independent:0.20}, 
+    yan:      {dominant:0.20, warm:0.05, playful:0.05, reliable:0.10, romantic:0.20, ambitious:0.20, rebellious:0.05, independent:0.15}, 
+    xiao:     {dominant:0.20, warm:0.10, playful:0.05, reliable:0.05, romantic:0.15, ambitious:0.20, rebellious:0.15, independent:0.10}, 
+    baima:    {dominant:0.05, warm:0.15, playful:0.10, reliable:0.30, romantic:0.10, ambitious:0.05, rebellious:0.05, independent:0.20}, 
+    song:     {dominant:0.10, warm:0.15, playful:0.05, reliable:0.20, romantic:0.15, ambitious:0.05, rebellious:0.05, independent:0.25}, 
+    taohuawo: {dominant:0.05, warm:0.15, playful:0.25, reliable:0.10, romantic:0.05, ambitious:0.10, rebellious:0.10, independent:0.20}, 
+    yuzhou:   {dominant:0.10, warm:0.20, playful:0.20, reliable:0.10, romantic:0.05, ambitious:0.10, rebellious:0.10, independent:0.15}, 
+    kechan:   {dominant:0.05, warm:0.20, playful:0.05, reliable:0.30, romantic:0.05, ambitious:0.15, rebellious:0.05, independent:0.15}  
+  };
+
+  let best = 'dongfang', minDistance = Infinity;
+  Object.keys(charProfiles).forEach(cid => {
+    let dist = 0;
+    DIMS.forEach(d => {
+      dist += Math.pow(userProfile[d] - charProfiles[cid][d], 2);
+    });
+    if(dist < minDistance) {
+      minDistance = dist;
+      best = cid;
+    }
+  });
+  
+  return best;
+}
+
+function showResult() {
+  if(answers[current]===null) return;
+  const s = calcScores();
+  const charId = matchChar(s);
+  const c = CHARS[charId];
+  
+  // 寻找用户的最大值，用于计算雷达条的百分比
+  const maxS = Math.max(...Object.values(s)) || 1;
+  
+  // 找出得分最高的维度用于【核心心理画像】
+  let topDim = 'warm';
+  let topDimScore = -1;
+  Object.keys(s).forEach(k => {
+    if(s[k] > topDimScore) { topDimScore = s[k]; topDim = k; }
+  });
+
+  document.getElementById('test-page').classList.add('hidden');
+  const rp = document.getElementById('result-page');
+  rp.classList.remove('hidden');
+
+  // 生成 8 维评分条 HTML
+  const barsHtml = DIMS.map(d => {
+    let percent = Math.round((s[d] / maxS) * 100);
+    if (percent < 5) percent = 5; 
+    
+    const isTop = (d === topDim);
+    const barGradient = isTop ? 'linear-gradient(90deg, #7B57D1, #432A7A)' : 'linear-gradient(90deg, #B79AF0, #7B57D1)';
+    const textWeight = isTop ? '600' : '500';
+    const textColor = isTop ? 'var(--theme-main)' : 'var(--color-text-primary)';
+
+    return `
+    <div class="score-row">
+      <div class="score-label-wrap" style="color: ${textColor}; font-weight: ${textWeight};">
+        <span>${DIM_LABELS[d].title}</span>
+      </div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-fill" style="width:0%; background: ${barGradient};" data-width="${percent}%"></div>
+      </div>
+      <div class="score-desc" style="margin-top:4px;">${DIM_LABELS[d].desc}</div>
+    </div>`;
+  }).join('');
+
+  const tagsHtml = c.tags.map(t=>`<span class="tag"># ${t}</span>`).join('');
+
+  // 构建图片 HTML
+  const imageHtml = c.img ? `<div class="result-image-frame"><img src="${c.img}" alt="${c.name}" class="result-img"></div>` : '';
+
+  rp.innerHTML = `
+    <div class="result-header">
+      <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:0.5rem;letter-spacing:1px;">平行宇宙中，你灵魂的最终锚点是</div>
+      ${imageHtml}
+      <div class="result-name">${c.name}</div>
+      <div class="result-role">${c.role}</div>
+    </div>
+    
+    <div class="result-card">
+      <div class="section-title">人物设定与羁绊</div>
+      <div class="result-desc">${c.desc}</div>
+      <div class="psy-match">${c.psyMatch}</div>
+      <div class="result-tags">${tagsHtml}</div>
+    </div>
+
+    <div class="result-card">
+      <div class="section-title">深层心理剖析：你为何会选他？</div>
+      <div class="psy-analysis">
+        ${PSY_PROFILES[topDim]}
+      </div>
+      <div style="font-size:14px;color:var(--theme-dark);margin-bottom:14px; margin-top:1.5rem; font-weight:600;">你的 8 维潜意识雷达数据：</div>
+      <div class="score-bars">${barsHtml}</div>
+    </div>
+
+    <button class="retry-btn" onclick="retryTest()">↺ 重新开启意识连结</button>
+  `;
+
+  // 延迟触发进度条动画
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fill').forEach(bar => {
+      bar.style.width = bar.getAttribute('data-width');
+    });
+  }, 100);
+}
+
+function retryTest() {
+  current = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  document.getElementById('progress').style.width = '0%';
+  document.getElementById('result-page').classList.add('hidden');
+  document.getElementById('cover-page').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
