@@ -26,10 +26,10 @@ body { font-family: var(--font-sans); background: var(--color-background-seconda
 .app { max-width: 600px; margin: 0 auto; padding: 2rem 1.5rem; min-height: 100vh; background: var(--color-background-primary); box-shadow: 0 4px 20px rgba(123, 87, 209, 0.08); }
 
 /* 封面样式 */
-.cover { text-align: center; padding: 3rem 0; }
-.cover-title { font-size: 28px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.8rem; letter-spacing: 1px; }
-.cover-sub { font-size: 15px; color: var(--color-text-secondary); margin-bottom: 0.5rem; line-height: 1.6; }
-.cover-tag { display: inline-block; background: var(--theme-light); color: var(--theme-dark); font-size: 13px; padding: 6px 16px; border-radius: 30px; margin: 1rem 0 2rem; font-weight: 500; }
+.cover { text-align: center; padding: 4rem 0 3rem; }
+.cover-title { font-size: 44px; font-weight: 700; color: var(--theme-main); margin-bottom: 0.5rem; letter-spacing: 2px; line-height: 1; }
+.cover-sub { font-size: 15px; color: var(--color-text-secondary); margin-bottom: 0.8rem; line-height: 1.6; }
+.cover-tag { display: inline-block; background: var(--theme-light); color: var(--theme-dark); font-size: 12px; padding: 5px 14px; border-radius: 30px; margin: 0.8rem 0 1.2rem; font-weight: 500; }
 .start-btn { background: linear-gradient(135deg, #9C7AF0, #7B57D1); color: white; border: none; border-radius: 30px; padding: 16px 48px; font-size: 18px; font-weight: 500; cursor: pointer; box-shadow: 0 8px 16px rgba(123, 87, 209, 0.25); transition: transform 0.2s, box-shadow 0.2s; }
 .start-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(123, 87, 209, 0.35); }
 
@@ -88,15 +88,12 @@ body { font-family: var(--font-sans); background: var(--color-background-seconda
   <!-- 封面页 -->
   <div id="cover-page">
     <div class="cover">
-      <div style="font-size:14px;color:var(--theme-main);font-weight:600;margin-bottom:1rem;">王鹤棣宇宙：谁是最适合你的男友？</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);font-weight:500;margin-bottom:0.8rem;letter-spacing:0.5px;">王鹤棣宇宙 · 男友匹配测试</div>
       <div class="cover-title">DDTI</div>
-      <div class="cover-sub">25道灵魂叩问，测出与你最匹配的棣系男友类型</div>
-      <div class="cover-tag">8维人格解析 · 宿命感羁绊测试</div>
-      <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:2.5rem;line-height:1.8;">
-        15个平行宇宙角色正在等待共振<br>从恋爱直觉到职场抗压，全面测算你们的灵魂契合度
-      </div>
+      <div class="cover-sub">谁是最适合你的男友？</div>
+      <div class="cover-tag">25题 · 8维人格匹配</div>
       <button class="start-btn" onclick="startTest()">开启意识连结 →</button>
-      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:1rem;opacity:0.9;">仅供娱乐免责声明：本测试结果基于趣味题目生成，不构成任何现实建议。</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:1rem;opacity:0.85;">仅供娱乐，不构成任何现实建议</div>
     </div>
   </div>
 
@@ -586,7 +583,7 @@ function showResult() {
 
   rp.innerHTML = `
     <div class="result-header">
-      <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:0.5rem;letter-spacing:1px;">平行宇宙中，你灵魂的最终锚点是</div>
+      <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:0.5rem;letter-spacing:1px;">王鹤棣宇宙中，最适合你的棣系男友是</div>
       ${imageHtml}
       <div class="result-name">${c.name}</div>
       <div class="result-role">${c.role}</div>
